@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Trò chơi trắc nghiệm — Thiết bị mạng</title>
+    <style>
+        :root {
+            --bg: #0f1724;
+            --card: #0b1220;
+            --accent: #06b6d4;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color: #e6eef6;
+            background: linear-gradient(180deg, #031025 0%, var(--bg) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px
+        }
+
+        .wrap {
+            width: 960px;
+            max-width: 96%;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0;
+            color: white
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6);
+        }
+
+        .question {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start
+        }
+
+        .q-index {
+            min-width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700
+        }
+
+        .q-body {
+            flex: 1
+        }
+
+        .q-text {
+            font-size: 16px;
+            margin: 0 0 8px
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px
+        }
+
+        .opt {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid transparent
+        }
+
+        .opt:hover {
+            transform: translateY(-2px)
+        }
+
+        .opt.selected {
+            outline: 2px solid rgba(6, 182, 212, 0.12);
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.06), rgba(6, 182, 212, 0.02))
+        }
+
+        .opt.correct {
+            border-color: var(--success);
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.06)
+        }
+
+        .opt.wrong {
+            border-color: var(--danger);
+            opacity: 0.9
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 14px
+        }
+
+        button {
+            background: var(--accent);
+            color: #042027;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        button.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid rgba(6, 182, 212, 0.12)
+        }
+
+        .explain {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--muted);
+            display: none
+        }
+
+        .scorebar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 14px
+        }
+
+        .progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            flex: 1;
+            margin: 0 12px;
+            overflow: hidden
+        }
+
+        .progress>i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #7c3aed);
+            width: 0%
+        }
+
+        .result {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(7, 89, 133, 0.12), rgba(6, 182, 212, 0.06));
+            color: white
+        }
+
+        .footer-note {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 10px
+        }
+
+        @media (max-width:640px) {
+            .options {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div>
+                <h1>Trắc nghiệm: Thiết bị mạng (Game)</h1>
+                <div class="meta">Chọn đáp án đúng — xem giải thích ngay sau khi trả lời</div>
+            </div>
+            <div class="meta">Số câu: <strong id="total">5</strong></div>
+        </header>
+
+        <div class="card" id="card">
+            <!-- question injected here -->
+        </div>
+
+        <div class="footer-note">Mẹo: bấm số 1–4 trên bàn phím để chọn đáp án. Dùng nút "Tiếp" để qua câu tiếp theo hoặc
+            nút "Xem kết quả" để chấm điểm.</div>
+    </div>
+
+    <script>
+        // Dữ liệu câu hỏi: câu, lựa chọn, đáp án (index 0..3), giải thích
+        const QUESTIONS = [
+            {
+                q: 'Thiết bị nào có khả năng chuyển tiếp dữ liệu chỉ đến thiết bị đích mà không phải gửi đến tất cả các thiết bị khác trong mạng?',
+                opts: ['Hub', 'Switch', 'Router', 'Modem'],
+                a: 1,
+                explain: 'Switch hoạt động tại tầng dữ liệu và sử dụng địa chỉ MAC để chuyển dữ liệu trực tiếp đến thiết bị đích, giảm xung đột tín hiệu.'
+            },
+            {
+                q: 'Thiết bị nào có chức năng dẫn đường cho dữ liệu khi kết nối trên mạng Internet?',
+                opts: ['Hub', 'Switch', 'Router', 'Modem'],
+                a: 2,
+                explain: 'Router định tuyến các gói dữ liệu giữa các mạng khác nhau, đặc biệt là giữa mạng nội bộ (LAN) và Internet.'
+            },
+            {
+                q: 'Bộ thu phát Wi-Fi còn được gọi là gì?',
+                opts: ['Hub', 'Switch', 'Access Point', 'Modem'],
+                a: 2,
+                explain: 'Access Point (AP) là thiết bị phát/thu sóng Wi‑Fi, cho phép thiết bị không dây kết nối vào mạng LAN.'
+            },
+            {
+                q: 'Để mở rộng phạm vi của một mạng LAN không dây, thiết bị nào thường được sử dụng?',
+                opts: ['Hub', 'Switch', 'Router', 'Access Point'],
+                a: 3,
+                explain: 'Access Point hoặc bộ mở rộng (repeater/mesh) thường dùng để mở rộng vùng phủ Wi‑Fi. Ở dạng đơn giản, thêm AP giúp mở rộng phạm vi.'
+            },
+            {
+                q: 'Thiết bị nào thường có nhiều cổng WAN và được nhà cung cấp dịch vụ Internet sử dụng để chuyển dữ liệu?',
+                opts: ['Hub', 'Switch', 'Router', 'Modem'],
+                a: 2,
+                explain: 'Router có nhiều cổng WAN và được sử dụng để chuyển dữ liệu qua mạng Internet, đặc biệt là trong các mạng lớn hoặc của các nhà cung cấp dịch vụ.'
+            }
+        ];
+
+        // App state
+        let idx = 0;
+        const userAnswers = new Array(QUESTIONS.length).fill(null);
+
+        const card = document.getElementById('card');
+        document.getElementById('total').textContent = QUESTIONS.length;
+
+        function renderQuestion(i) {
+            const item = QUESTIONS[i];
+            card.innerHTML = `
+        <div class="question">
+          <div class="q-index">${i + 1}/${QUESTIONS.length}</div>
+          <div class="q-body">
+            <p class="q-text">${escapeHtml(item.q)}</p>
+            <div class="options" role="list">
+              ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}" tabindex="0" role="button" aria-pressed="false"><strong>${String.fromCharCode(65 + j)}.</strong> <span>${escapeHtml(o)}</span></div>`).join('')}
+            </div>
+            <div class="controls">
+              <button id="prev" class="ghost">Quay lại</button>
+              <button id="next">Tiếp</button>
+              <button id="showResult" class="ghost">Xem kết quả</button>
+              <div style="margin-left:auto;color:var(--muted);font-size:13px">Chọn 1 đáp án</div>
+            </div>
+            <div class="explain" id="explain"></div>
+            <div class="scorebar">
+              <div class="meta">Điểm tạm: <strong id="tempScore">0</strong></div>
+              <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+              <div class="meta">${i + 1}/${QUESTIONS.length}</div>
+            </div>
+            <div class="result" id="resultBox"></div>
+          </div>
+        </div>
+      `;
+
+            // wire events
+            card.querySelectorAll('.opt').forEach(el => {
+                el.addEventListener('click', () => onChoose(parseInt(el.dataset.idx)));
+                el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') onChoose(parseInt(el.dataset.idx)); });
+            });
+
+            document.getElementById('prev').addEventListener('click', () => {
+                if (idx > 0) idx--, renderQuestion(idx);
+            });
+            document.getElementById('next').addEventListener('click', () => {
+                if (idx < QUESTIONS.length - 1) { idx++; renderQuestion(idx); } else { grade(); }
+            });
+            document.getElementById('showResult').addEventListener('click', grade);
+
+            // restore selected
+            if (userAnswers[i] !== null) {
+                const sel = card.querySelector(`.opt[data-idx="${userAnswers[i]}"]`);
+                if (sel) sel.classList.add('selected');
+                revealExplanation(i);
+            } else {
+                updateTempScore();
+            }
+
+            // keyboard shortcuts 1..4
+            window.onkeydown = (e) => {
+                if (e.key >= '1' && e.key <= String(Math.min(4, item.opts.length))) {
+                    const n = Number(e.key) - 1; onChoose(n);
+                }
+                if (e.key === 'ArrowRight') document.getElementById('next').click();
+                if (e.key === 'ArrowLeft') document.getElementById('prev').click();
+            };
+        }
+
+        function onChoose(choice) {
+            userAnswers[idx] = choice;
+            // mark selection
+            card.querySelectorAll('.opt').forEach(el => el.classList.remove('selected', 'correct', 'wrong'));
+            const el = card.querySelector(`.opt[data-idx="${choice}"]`);
+            if (el) el.classList.add('selected');
+            revealExplanation(idx);
+            updateTempScore();
+        }
+
+        function revealExplanation(i) {
+            const item = QUESTIONS[i];
+            const expl = document.getElementById('explain');
+            const resultBox = document.getElementById('resultBox');
+            expl.style.display = 'block';
+            const sel = userAnswers[i];
+            if (sel === null) { expl.textContent = 'Bạn chưa chọn đáp án.'; return; }
+            const isCorrect = sel === item.a;
+            expl.innerHTML = `<strong>Đáp án:</strong> ${String.fromCharCode(65 + item.a)}. ${item.opts[item.a]}<br><br><strong>Kết luận:</strong> ${isCorrect ? '<span style="color:var(--success)">Đúng</span>' : '<span style="color:var(--danger)">Sai</span>'}<br><div style="margin-top:8px;color:var(--muted)">${item.explain}</div>`;
+            // highlight options
+            card.querySelectorAll('.opt').forEach(el => {
+                const j = parseInt(el.dataset.idx);
+                el.classList.remove('correct', 'wrong');
+                if (j === item.a) el.classList.add('correct');
+                else if (j === sel && j !== item.a) el.classList.add('wrong');
+            });
+        }
+
+        function updateTempScore() {
+            const score = userAnswers.reduce((s, ans, i) => s + (ans === QUESTIONS[i].a ? 1 : 0), 0);
+            document.getElementById('tempScore').textContent = score + '/' + QUESTIONS.length;
+            const pct = Math.round((score / QUESTIONS.length) * 100);
+            document.getElementById('bar').style.width = pct + '%';
+        }
+
+        function grade() {
+            const score = userAnswers.reduce((s, ans, i) => s + (ans === QUESTIONS[i].a ? 1 : 0), 0);
+            const box = document.getElementById('resultBox');
+            box.style.display = 'block';
+            box.innerHTML = `<h3>Kết quả: ${score} / ${QUESTIONS.length}</h3>
+        <p style="margin:6px 0;color:var(--muted)">${score / QUESTIONS.length * 100}% — ${interpretScore(score)}</p>
+        <div style="margin-top:8px"><button id="review">Xem lại từng câu</button> <button id="retry" class="ghost">Làm lại</button></div>`;
+            document.getElementById('review').addEventListener('click', () => { idx = 0; renderQuestion(idx); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            document.getElementById('retry').addEventListener('click', () => { for (let i = 0; i < userAnswers.length; i++) userAnswers[i] = null; idx = 0; renderQuestion(idx); updateTempScore(); box.style.display = 'none'; });
+        }
+
+        function interpretScore(s) {
+            const pct = s / QUESTIONS.length;
+            if (pct === 1) return 'Tuyệt vời — 10 điểm (Hoàn thành)';
+            if (pct >= 0.8) return 'Giỏi — 9 điểm';
+            if (pct >= 0.6) return 'Khá — 7 điểm';
+            if (pct >= 0.4) return 'Trung bình — 5 điểm';
+            return 'Cần cố gắng — dưới 5 điểm';
+        }
+
+        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        // init
+        renderQuestion(0);
+        updateTempScore();
+    </script>
+</body>
+
+</html>
