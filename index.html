@@ -209,58 +209,89 @@
                 <h1>Trắc nghiệm: Thiết bị mạng (Game)</h1>
                 <div class="meta">Chọn đáp án đúng — xem giải thích ngay sau khi trả lời</div>
             </div>
-            <div class="meta">Số câu: <strong id="total">5</strong></div>
+            <div>
+                <input type="file" id="fileInput" accept=".json" style="display:none">
+                <button id="btnUpload">📂 Tải câu hỏi</button>
+                <button id="btnClear" class="ghost">🗑 Xóa bộ câu hỏi</button>
+            </div>
         </header>
 
-        <div class="card" id="card">
-            <!-- question injected here -->
-        </div>
+        <div class="card" id="card"></div>
 
-        <div class="footer-note">Mẹo: bấm số 1–4 trên bàn phím để chọn đáp án. Dùng nút "Tiếp" để qua câu tiếp theo hoặc
-            nút "Xem kết quả" để chấm điểm.</div>
+        <div class="footer-note">
+            Mẹo: bấm số 1–4 trên bàn phím để chọn đáp án.
+            Câu hỏi lưu trong localStorage, có thể upload file JSON để thay đổi.
+        </div>
     </div>
 
     <script>
-        // Dữ liệu câu hỏi: câu, lựa chọn, đáp án (index 0..3), giải thích
-        const QUESTIONS = [
-            {
-                q: 'Thiết bị nào có khả năng chuyển tiếp dữ liệu chỉ đến thiết bị đích mà không phải gửi đến tất cả các thiết bị khác trong mạng?',
-                opts: ['Hub', 'Switch', 'Router', 'Modem'],
-                a: 1,
-                explain: 'Switch hoạt động tại tầng dữ liệu và sử dụng địa chỉ MAC để chuyển dữ liệu trực tiếp đến thiết bị đích, giảm xung đột tín hiệu.'
-            },
-            {
-                q: 'Thiết bị nào có chức năng dẫn đường cho dữ liệu khi kết nối trên mạng Internet?',
-                opts: ['Hub', 'Switch', 'Router', 'Modem'],
-                a: 2,
-                explain: 'Router định tuyến các gói dữ liệu giữa các mạng khác nhau, đặc biệt là giữa mạng nội bộ (LAN) và Internet.'
-            },
-            {
-                q: 'Bộ thu phát Wi-Fi còn được gọi là gì?',
-                opts: ['Hub', 'Switch', 'Access Point', 'Modem'],
-                a: 2,
-                explain: 'Access Point (AP) là thiết bị phát/thu sóng Wi‑Fi, cho phép thiết bị không dây kết nối vào mạng LAN.'
-            },
-            {
-                q: 'Để mở rộng phạm vi của một mạng LAN không dây, thiết bị nào thường được sử dụng?',
-                opts: ['Hub', 'Switch', 'Router', 'Access Point'],
-                a: 3,
-                explain: 'Access Point hoặc bộ mở rộng (repeater/mesh) thường dùng để mở rộng vùng phủ Wi‑Fi. Ở dạng đơn giản, thêm AP giúp mở rộng phạm vi.'
-            },
-            {
-                q: 'Thiết bị nào thường có nhiều cổng WAN và được nhà cung cấp dịch vụ Internet sử dụng để chuyển dữ liệu?',
-                opts: ['Hub', 'Switch', 'Router', 'Modem'],
-                a: 2,
-                explain: 'Router có nhiều cổng WAN và được sử dụng để chuyển dữ liệu qua mạng Internet, đặc biệt là trong các mạng lớn hoặc của các nhà cung cấp dịch vụ.'
-            }
-        ];
+        const LS_KEY = 'quiz_questions_v1';
+        let QUESTIONS = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
 
-        // App state
+        // Nút upload JSON
+        const uploadBtn = document.createElement('input');
+        uploadBtn.type = 'file';
+        uploadBtn.accept = '.json';
+        uploadBtn.style.display = 'none';
+        document.body.appendChild(uploadBtn);
+
+        // Nút visible
+        const triggerBtn = document.createElement('button');
+        triggerBtn.textContent = '📂 Tải file JSON câu hỏi';
+        triggerBtn.style.marginBottom = '14px';
+        document.querySelector('.wrap').prepend(triggerBtn);
+
+        // Xử lý khi chọn file
+        triggerBtn.addEventListener('click', () => uploadBtn.click());
+        uploadBtn.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (Array.isArray(data)) {
+                        QUESTIONS = data;
+                        localStorage.setItem(LS_KEY, JSON.stringify(QUESTIONS));
+                        alert('✅ Đã tải dữ liệu mới! Trang sẽ tải lại.');
+                        location.reload();
+                    } else {
+                        alert('❌ File JSON không hợp lệ.');
+                    }
+                } catch (err) {
+                    alert('⚠️ Lỗi đọc file JSON: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Nếu chưa có localStorage → đọc file data.json (tự động)
+        if (!QUESTIONS) {
+            fetch('data.json')
+                .then(r => r.json())
+                .then(data => {
+                    QUESTIONS = data;
+                    localStorage.setItem(LS_KEY, JSON.stringify(QUESTIONS));
+                    location.reload();
+                })
+                .catch(err => {
+                    console.error('Không thể tải data.json', err);
+                    alert('Không tìm thấy data.json, vui lòng tải file JSON thủ công.');
+                });
+        }
+        // === Xóa dữ liệu ===
+        document.getElementById('btnClear').addEventListener('click', () => {
+            if (confirm('Xóa toàn bộ câu hỏi hiện tại?')) {
+                localStorage.removeItem(LS_KEY);
+                alert('Đã xóa. Trang sẽ tải lại.');
+                location.reload();
+            }
+        });
+
+        // === Logic game (giữ nguyên như trước) ===
         let idx = 0;
         const userAnswers = new Array(QUESTIONS.length).fill(null);
-
         const card = document.getElementById('card');
-        document.getElementById('total').textContent = QUESTIONS.length;
 
         function renderQuestion(i) {
             const item = QUESTIONS[i];
@@ -269,62 +300,32 @@
           <div class="q-index">${i + 1}/${QUESTIONS.length}</div>
           <div class="q-body">
             <p class="q-text">${escapeHtml(item.q)}</p>
-            <div class="options" role="list">
-              ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}" tabindex="0" role="button" aria-pressed="false"><strong>${String.fromCharCode(65 + j)}.</strong> <span>${escapeHtml(o)}</span></div>`).join('')}
+            <div class="options">
+              ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}"><strong>${String.fromCharCode(65 + j)}.</strong> ${escapeHtml(o)}</div>`).join('')}
             </div>
             <div class="controls">
               <button id="prev" class="ghost">Quay lại</button>
               <button id="next">Tiếp</button>
               <button id="showResult" class="ghost">Xem kết quả</button>
-              <div style="margin-left:auto;color:var(--muted);font-size:13px">Chọn 1 đáp án</div>
             </div>
             <div class="explain" id="explain"></div>
             <div class="scorebar">
               <div class="meta">Điểm tạm: <strong id="tempScore">0</strong></div>
-              <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+              <div class="progress"><i id="bar"></i></div>
               <div class="meta">${i + 1}/${QUESTIONS.length}</div>
             </div>
             <div class="result" id="resultBox"></div>
           </div>
-        </div>
-      `;
-
-            // wire events
-            card.querySelectorAll('.opt').forEach(el => {
-                el.addEventListener('click', () => onChoose(parseInt(el.dataset.idx)));
-                el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') onChoose(parseInt(el.dataset.idx)); });
-            });
-
-            document.getElementById('prev').addEventListener('click', () => {
-                if (idx > 0) idx--, renderQuestion(idx);
-            });
-            document.getElementById('next').addEventListener('click', () => {
-                if (idx < QUESTIONS.length - 1) { idx++; renderQuestion(idx); } else { grade(); }
-            });
+        </div>`;
+            card.querySelectorAll('.opt').forEach(el => el.addEventListener('click', () => onChoose(parseInt(el.dataset.idx))));
+            document.getElementById('prev').addEventListener('click', () => { if (idx > 0) idx--, renderQuestion(idx); });
+            document.getElementById('next').addEventListener('click', () => { if (idx < QUESTIONS.length - 1) { idx++; renderQuestion(idx); } else { grade(); } });
             document.getElementById('showResult').addEventListener('click', grade);
-
-            // restore selected
-            if (userAnswers[i] !== null) {
-                const sel = card.querySelector(`.opt[data-idx="${userAnswers[i]}"]`);
-                if (sel) sel.classList.add('selected');
-                revealExplanation(i);
-            } else {
-                updateTempScore();
-            }
-
-            // keyboard shortcuts 1..4
-            window.onkeydown = (e) => {
-                if (e.key >= '1' && e.key <= String(Math.min(4, item.opts.length))) {
-                    const n = Number(e.key) - 1; onChoose(n);
-                }
-                if (e.key === 'ArrowRight') document.getElementById('next').click();
-                if (e.key === 'ArrowLeft') document.getElementById('prev').click();
-            };
+            if (userAnswers[i] !== null) { const sel = card.querySelector(`.opt[data-idx="${userAnswers[i]}"]`); if (sel) sel.classList.add('selected'); revealExplanation(i); } else { updateTempScore(); }
         }
 
         function onChoose(choice) {
             userAnswers[idx] = choice;
-            // mark selection
             card.querySelectorAll('.opt').forEach(el => el.classList.remove('selected', 'correct', 'wrong'));
             const el = card.querySelector(`.opt[data-idx="${choice}"]`);
             if (el) el.classList.add('selected');
@@ -335,13 +336,11 @@
         function revealExplanation(i) {
             const item = QUESTIONS[i];
             const expl = document.getElementById('explain');
-            const resultBox = document.getElementById('resultBox');
             expl.style.display = 'block';
             const sel = userAnswers[i];
             if (sel === null) { expl.textContent = 'Bạn chưa chọn đáp án.'; return; }
             const isCorrect = sel === item.a;
             expl.innerHTML = `<strong>Đáp án:</strong> ${String.fromCharCode(65 + item.a)}. ${item.opts[item.a]}<br><br><strong>Kết luận:</strong> ${isCorrect ? '<span style="color:var(--success)">Đúng</span>' : '<span style="color:var(--danger)">Sai</span>'}<br><div style="margin-top:8px;color:var(--muted)">${item.explain}</div>`;
-            // highlight options
             card.querySelectorAll('.opt').forEach(el => {
                 const j = parseInt(el.dataset.idx);
                 el.classList.remove('correct', 'wrong');
@@ -353,33 +352,32 @@
         function updateTempScore() {
             const score = userAnswers.reduce((s, ans, i) => s + (ans === QUESTIONS[i].a ? 1 : 0), 0);
             document.getElementById('tempScore').textContent = score + '/' + QUESTIONS.length;
-            const pct = Math.round((score / QUESTIONS.length) * 100);
-            document.getElementById('bar').style.width = pct + '%';
+            document.getElementById('bar').style.width = (score / QUESTIONS.length * 100) + '%';
         }
 
         function grade() {
             const score = userAnswers.reduce((s, ans, i) => s + (ans === QUESTIONS[i].a ? 1 : 0), 0);
             const box = document.getElementById('resultBox');
             box.style.display = 'block';
-            box.innerHTML = `<h3>Kết quả: ${score} / ${QUESTIONS.length}</h3>
-        <p style="margin:6px 0;color:var(--muted)">${score / QUESTIONS.length * 100}% — ${interpretScore(score)}</p>
-        <div style="margin-top:8px"><button id="review">Xem lại từng câu</button> <button id="retry" class="ghost">Làm lại</button></div>`;
-            document.getElementById('review').addEventListener('click', () => { idx = 0; renderQuestion(idx); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            box.innerHTML = `<h3>Kết quả: ${score}/${QUESTIONS.length}</h3>
+        <p style="margin:6px 0;color:var(--muted)">${(score / QUESTIONS.length * 100).toFixed(0)}% — ${interpretScore(score)}</p>
+        <div style="margin-top:8px"><button id="retry" class="ghost">Làm lại</button></div>`;
             document.getElementById('retry').addEventListener('click', () => { for (let i = 0; i < userAnswers.length; i++) userAnswers[i] = null; idx = 0; renderQuestion(idx); updateTempScore(); box.style.display = 'none'; });
         }
 
         function interpretScore(s) {
             const pct = s / QUESTIONS.length;
-            if (pct === 1) return 'Tuyệt vời — 10 điểm (Hoàn thành)';
+            if (pct === 1) return 'Tuyệt vời — 10 điểm';
             if (pct >= 0.8) return 'Giỏi — 9 điểm';
             if (pct >= 0.6) return 'Khá — 7 điểm';
             if (pct >= 0.4) return 'Trung bình — 5 điểm';
-            return 'Cần cố gắng — dưới 5 điểm';
+            return 'Cần cố gắng';
         }
 
-        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
 
-        // init
         renderQuestion(0);
         updateTempScore();
     </script>

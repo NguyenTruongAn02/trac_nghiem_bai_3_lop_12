@@ -1,0 +1,112 @@
+[
+    {
+        "q": "Dịch vụ lưu trữ và chia sẻ tệp tin trên Internet còn được gọi là gì?",
+        "opts": [
+            "Ổ cứng ngoài",
+            "Ổ đĩa trực tuyến",
+            "Bộ nhớ tạm thời",
+            "Ổ đĩa nội bộ"
+        ],
+        "a": 1,
+        "explain": "Dịch vụ lưu trữ và chia sẻ tệp tin trên Internet được gọi là 'ổ đĩa trực tuyến' vì cho phép người dùng lưu trữ và truy cập dữ liệu qua mạng Internet."
+    },
+    {
+        "q": "Tại sao dịch vụ lưu trữ và chia sẻ tệp tin trên Internet còn được gọi là “lưu trữ đám mây”?",
+        "opts": [
+            "Vì dữ liệu được lưu trong mây thật",
+            "Vì dữ liệu được lưu trên Internet, có thể truy cập ở mọi nơi",
+            "Vì dữ liệu bị xóa sau khi sử dụng",
+            "Vì chỉ lưu được hình ảnh"
+        ],
+        "a": 1,
+        "explain": "“Lưu trữ đám mây” là cách ví von vì dữ liệu được lưu trên Internet và có thể truy cập ở bất kỳ đâu có mạng."
+    },
+    {
+        "q": "Một trong những ưu điểm nổi bật của việc lưu trữ trực tuyến là gì?",
+        "opts": [
+            "Chỉ xem được tệp khi có mạng nội bộ",
+            "Dễ bị mất dữ liệu khi tắt máy",
+            "Có thể chia sẻ tệp cho người khác qua Internet",
+            "Chỉ lưu trữ được tệp văn bản"
+        ],
+        "a": 2,
+        "explain": "Ưu điểm nổi bật là có thể chia sẻ tệp dễ dàng cho người khác thông qua liên kết Internet, tiết kiệm thời gian và công sức."
+    },
+    {
+        "q": "Khi chia sẻ tệp tin trên Google Drive, người được chia sẻ có thể được cấp quyền chỉ xem. Điều này có nghĩa là gì?",
+        "opts": [
+            "Có thể chỉnh sửa nội dung tệp",
+            "Có thể nhận xét và bình luận",
+            "Chỉ được xem nội dung, không chỉnh sửa",
+            "Có thể xóa tệp"
+        ],
+        "a": 2,
+        "explain": "Quyền “Chỉ xem” nghĩa là người được chia sẻ chỉ có thể đọc nội dung, không được chỉnh sửa hay xóa tệp."
+    },
+    {
+        "q": "Dịch vụ nào sau đây không phải là dịch vụ lưu trữ và chia sẻ tệp tin trên Internet?",
+        "opts": [
+            "Google Drive",
+            "Dropbox",
+            "iCloud",
+            "Microsoft Word"
+        ],
+        "a": 3,
+        "explain": "Microsoft Word là phần mềm soạn thảo văn bản, không phải là dịch vụ lưu trữ và chia sẻ tệp tin trực tuyến."
+    },
+    {
+        "q": "Người dùng có thể tải tệp lên ổ đĩa trực tuyến để làm gì?",
+        "opts": [
+            "Để lưu trữ và sử dụng lại khi cần",
+            "Để xóa dữ liệu khỏi máy tính",
+            "Để chuyển đổi định dạng tệp",
+            "Để tăng tốc Internet"
+        ],
+        "a": 0,
+        "explain": "Tải tệp lên giúp lưu trữ an toàn và có thể truy cập, sử dụng lại ở mọi nơi khi cần thiết."
+    },
+    {
+        "q": "Khi chia sẻ tệp với quyền chỉnh sửa, người được chia sẻ không thể làm gì sau đây?",
+        "opts": [
+            "Chỉnh sửa nội dung tệp",
+            "Xóa tệp",
+            "Tạo mới tệp",
+            "Hủy quyền chia sẻ của người khác"
+        ],
+        "a": 3,
+        "explain": "Người được chia sẻ có thể chỉnh sửa nội dung, nhưng không thể hủy quyền chia sẻ của người khác (chỉ chủ sở hữu mới có quyền này)."
+    },
+    {
+        "q": "Ví dụ nào sau đây thể hiện ứng dụng thực tế của lưu trữ và chia sẻ tệp trực tuyến?",
+        "opts": [
+            "Lưu bài hát trong USB",
+            "Gửi bài tập nhóm qua Google Drive",
+            "In tài liệu ra giấy để chia sẻ",
+            "Lưu tài liệu vào ổ cứng máy tính"
+        ],
+        "a": 1,
+        "explain": "Việc gửi bài tập nhóm qua Google Drive thể hiện rõ khả năng lưu trữ và chia sẻ tệp trực tuyến."
+    },
+    {
+        "q": "Khi người dùng đăng ký dịch vụ lưu trữ trực tuyến, họ được cấp gì?",
+        "opts": [
+            "Một tài khoản email",
+            "Một không gian nhớ trực tuyến",
+            "Một phần mềm diệt virus",
+            "Một ổ đĩa vật lý"
+        ],
+        "a": 1,
+        "explain": "Người dùng được cấp dung lượng lưu trữ trực tuyến để tải lên và quản lý tệp của mình."
+    },
+    {
+        "q": "Nhược điểm nào sau đây có thể xảy ra khi sử dụng dịch vụ lưu trữ trực tuyến?",
+        "opts": [
+            "Không cần Internet vẫn truy cập được",
+            "Dễ chia sẻ với người khác",
+            "Phụ thuộc vào kết nối Internet",
+            "Không giới hạn dung lượng"
+        ],
+        "a": 2,
+        "explain": "Lưu trữ trực tuyến yêu cầu kết nối Internet để truy cập dữ liệu, nên bị hạn chế khi mất mạng."
+    }
+]
