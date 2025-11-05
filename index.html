@@ -299,7 +299,7 @@
         <div class="question">
           <div class="q-index">${i + 1}/${QUESTIONS.length}</div>
           <div class="q-body">
-            <p class="q-text">${escapeHtml(item.q)}</p>
+            <p class="q-text">${(item.q)}</p>
             <div class="options">
               ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}"><strong>${String.fromCharCode(65 + j)}.</strong> ${(o)}</div>`).join('')}
             </div>
