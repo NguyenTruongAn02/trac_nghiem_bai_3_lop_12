@@ -206,7 +206,7 @@
     <div class="wrap">
         <header>
             <div>
-                <h1>Trắc nghiệm: Thiết bị mạng (Game)</h1>
+                <h1>Trắc nghiệm: </h1>
                 <div class="meta">Chọn đáp án đúng — xem giải thích ngay sau khi trả lời</div>
             </div>
             <div>
@@ -301,7 +301,7 @@
           <div class="q-body">
             <p class="q-text">${escapeHtml(item.q)}</p>
             <div class="options">
-              ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}"><strong>${String.fromCharCode(65 + j)}.</strong> ${escapeHtml(o)}</div>`).join('')}
+              ${item.opts.map((o, j) => `<div class="opt" data-idx="${j}"><strong>${String.fromCharCode(65 + j)}.</strong> ${(o)}</div>`).join('')}
             </div>
             <div class="controls">
               <button id="prev" class="ghost">Quay lại</button>
